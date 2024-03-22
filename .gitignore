@@ -1,3 +1,5 @@
 venv
 .env
 oauth_settings.yml
+*.sqlite3
+__pycache__
