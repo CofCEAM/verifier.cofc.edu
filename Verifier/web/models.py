@@ -3,28 +3,6 @@ from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Setting(models.Model):
-    message_template = models.TextField(
-        default="Provide the following passphrase to IT Service desk: {{passphrase}}"
-    )
-    passphrase_length = models.IntegerField(
-        verbose_name="Length of the passphrase to use for verification", default=4
-    )
-    twilio_account_sid = models.CharField(
-        verbose_name="Twilio Account SID (for SMS)", default="", max_length=50
-    )
-    twilio_auth_token = models.CharField(
-        verbose_name="Twilio Auth Token (for SMS)", default="", max_length=50
-    )
-    twilio_messaging_service_sid = models.CharField(
-        verbose_name="Twilio Messaging Service SID (for SMS)", max_length=50
-    )
-    ethos_api_key = models.CharField(
-        "Ethos API Key (for an Ethos Integrate App Registration with persons graphql resource)",
-        max_length=50,
-    )
-
-
 # Create your models here.
 class Event(models.Model):
     user = models.ForeignKey(
