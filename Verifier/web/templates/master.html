@@ -3,7 +3,6 @@
 
 <head>
     {% load static %}
-    {% load compress %}
     <meta charset="utf-8" />
 
     <title>CofC User Phone Verifier</title>
@@ -74,6 +73,12 @@
                         <li class="nav-item {% if page == 'verification-log' %} active {% endif %}">
                             <a class="nav-link" href="{% url 'web:verification-log' %}">Verification Log</a>
                         </li>
+                        <!-- show logout if authenticated -->
+                        {% if user.is_authenticated %}
+                        <li class="nav-item {% if page == 'logout' %} active {% endif %}">
+                            <a class="nav-link" href="{% url 'web:logout' %}">Logout</a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </nav>
@@ -117,9 +122,7 @@
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/1328657c58.js" crossorigin="anonymous"></script>
-    {% compress js %}
     <script defer type="text/javascript" src="{% static 'js/main.js' %}"></script>
-    {% endcompress %}
 </body>
 
 </html>
