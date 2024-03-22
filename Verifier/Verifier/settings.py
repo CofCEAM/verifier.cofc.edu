@@ -12,11 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import logging.config
 from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / "Verifier" / ".env")
 DEBUG = int(os.environ.get("DJANGO_DEBUG", True))
 PRODUCTION = int(os.environ.get("PRODUCTION", False))
 CSRF_TRUSTED_ORIGINS = [
@@ -24,17 +23,14 @@ CSRF_TRUSTED_ORIGINS = [
     "https://verifier.cofc.edu",
 ]
 
-if not PRODUCTION:
-    load_dotenv()
+ALLOWED_HOSTS = [
+    "verifier.cofc.edu",
+    "verifier.charleston.edu",
+    "127.0.0.1",
+    "localhost",
+]
 
-
-ALLOWED_HOSTS = ["verifier.cofc.edu", "127.0.0.1", "localhost"]
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "kzUFUTJ0QqXlnn5ShsSQzn7fKFpQbeyt"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 
 INSTALLED_APPS = [
@@ -44,8 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "compressor",
-    "django_extensions",
     "web",
 ]
 
@@ -62,40 +56,29 @@ MIDDLEWARE = [
 # model backend for development
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 
-
-# Logging Configuration
-# Clear prev config
-LOGGING_CONFIG = None
-
 # Get loglevel from env
 LOGLEVEL = os.getenv("DJANGO_LOGLEVEL", "info").upper()
 
-logging.config.dictConfig(
-    {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "console": {
-                "format": "%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s",
-            },
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "handlers": {
+        "console": {
+            "level": LOGLEVEL,
+            "class": "logging.StreamHandler",
         },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "formatter": "console",
-            },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOGLEVEL,
+            "propagate": True,
         },
-        "loggers": {
-            "": {
-                "level": LOGLEVEL,
-                "handlers": [
-                    "console",
-                ],
-            },
-        },
-    }
-)
+    },
+}
 
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
 
 ROOT_URLCONF = "Verifier.urls"
 
@@ -116,18 +99,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "Verifier.wsgi.application"
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -152,12 +123,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
+TIME_ZONE = "America/New_York"
 USE_I18N = True
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -165,22 +133,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = (
-    "/verifier/staticfiles/" if PRODUCTION else os.path.join(BASE_DIR, "staticfiles")
-)
-
-
-COMPRESS_ENABLED = True
-COMPRESS_ROOT = STATIC_ROOT
-COMPRESS_OFFLINE = True
-# hashed output to main/static/main folder instead of main/static/CACHE
-COMPRESS_OUTPUT_DIR = "compressed"
-COMPRESS_CSS_FILTERS = ["compressor.filters.cssmin.CSSMinFilter"]
-STATICFILES_FINDERS = (
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
-)
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# For dev, when debug off
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "web", "static"),)
 
 # Without PHONENUMBER_DEFAULT_REGION = 'US' in the settings, django-phonenumberfield
 # won't allow you to input anything users from the United States would recognize as a phone number.
@@ -196,10 +151,54 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PASSPHRASE_LENGTH = 4
 ETHOS_GRAPHQL_URL = "https://integrate.elluciancloud.com/graphql"
 ETHOS_AUTH_URL = "https://integrate.elluciancloud.com/auth"
+
+
+MESSAGE_TEMPLATE = "Provide the following passphrase to IT Service desk: {{passphrase}}"
+PASSPHRASE_LENGTH = int(os.environ.get("PASSPHRASE_LENGTH", 4))
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "")
+TWILIO_MESSAGING_SERVICE_SID = os.environ.get("TWILIO_MESSAGING_SERVICE_SID", "")
+ETHOS_API_KEY = os.environ.get("ETHOS_API_KEY", "")
+
+
 # PROD specific settings
 if PRODUCTION:
-    # Add this variable to match the Azure Registered App's Redirect URI
-    MICROSOFT_CALLBACK_URL = "https://verifier.cofc.edu/custom-microsoft-callback/"
+    # This is necessary because Azure does not guarantee
+    # to return scopes in the same case and order as requested
+    os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
+    os.environ["OAUTHLIB_IGNORE_SCOPE_CHANGE"] = "1"
+    MICROSOFT_AUTH_CLIENT_ID = os.environ.get("MICROSOFT_AUTH_CLIENT_ID", "")
+    MICROSOFT_AUTH_CLIENT_SECRET = os.environ.get("MICROSOFT_AUTH_CLIENT_SECRET", "")
+    MICROSOFT_AUTH_TENANT_ID = os.environ.get("MICROSOFT_AUTH_TENANT_ID", "")
+    MICROSOFT_AUTH_SCOPES = os.environ.get(
+        "MICROSOFT_AUTH_SCOPES", "openid profile offline_access user.read"
+    )
+    MICROSOFT_AUTH_AUTHORITY = os.environ.get(
+        "MICROSOFT_AUTH_AUTHORITY",
+        f"https://login.microsoftonline.com/{MICROSOFT_AUTH_TENANT_ID}",
+    )
+    MICROSOFT_AUTH_AUTHORIZE_ENDPOINT = (
+        f"{MICROSOFT_AUTH_AUTHORITY}/oauth2/v2.0/authorize"
+    )
+    MICROSOFT_AUTH_TOKEN_ENDPOINT = f"{MICROSOFT_AUTH_AUTHORITY}/oauth2/v2.0/token"
+    MICROSOFT_AUTH_REDIRECT_URI = os.environ.get(
+        "MICROSOFT_AUTH_REDIRECT_URI", "/custom-microsoft-callback"
+    )
+    MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID = os.environ.get(
+        "MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID", ""
+    )
+    if not all(
+        [
+            MICROSOFT_AUTH_CLIENT_ID,
+            MICROSOFT_AUTH_CLIENT_SECRET,
+            MICROSOFT_AUTH_TENANT_ID,
+            MICROSOFT_AUTH_SCOPES,
+            MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID,
+        ]
+    ):
+        raise ValueError(
+            "Missing one or more required environment variables for Microsoft Authentication"
+        )
 
     DATABASES = {
         "default": {
@@ -207,7 +206,7 @@ if PRODUCTION:
             "NAME": os.environ.get("MYSQL_DATABASE", ""),
             "USER": os.environ.get("MYSQL_USER", ""),
             "PASSWORD": os.environ.get("MYSQL_PASSWORD", ""),
-            "HOST": os.environ.get("MYSQL_HOST", ""),
+            "HOST": os.environ.get("MYSQL_HOST", "localhost"),
             "PORT": "3306",
         }
     }
