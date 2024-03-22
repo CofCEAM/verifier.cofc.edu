@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="https://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+    {% load static %}
+    {% load compress %}
+    <meta charset="utf-8" />
+
+    <title>CofC User Phone Verifier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="shortcut icon" href="https://www.cofc.edu/favicon.ico" />
+    <link href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.9/css/mdb.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+
+<style>
+    .navbar .navbar-toggler .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+    }
+</style>
+
+<body id="body">
+    <div id="loader" class="loader"></div>
+    <div id="whitebg"
+        style="position:fixed;top:0;left:0;right:0;bottom:0; background:white;z-index:10;overflow:hidden;"></div>
+    <style>
+        body {
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+        }
+
+        .row.branding {
+            background-color: #660000;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+    </style>
+    <script>
+        var page = "{{ page }}";
+        var status = "{{ status }}";
+    </script>
+
+
+    <div id="pg" class="pb-5">
+        <div id="hd">
+            <div class="row branding custom-row">
+                <div class="container ml-3">
+                    <div class="wordmark mr-auto">
+                        <a href="https://cofc.edu">
+                            <img width="200" src="https://cofc.edu/images/cofc-logo-2014d.png" alt="CofC Logo" /></a>
+                    </div>
+                    <!--CLOSE wordmark-->
+                </div>
+                <!--/.container-->
+            </div>
+            <!--/.row-->
+
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="/">CofC User Phone Verifier</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+                    aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                        <li class="nav-item {% if page == 'home' %} active {% endif %}">
+                            <a class="nav-link" href="{% url 'web:home' %}">Home</a>
+                        </li>
+                        <li class="nav-item {% if page == 'verification-log' %} active {% endif %}">
+                            <a class="nav-link" href="{% url 'web:verification-log' %}">Verification Log</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <!--/#hd -->
+
+        {% block content %} {% endblock %}
+
+    </div>
+    <!-- /#pg  -->
+    <!-- Footer -->
+    <footer class="page-footer font-small bg-dark fixed-bottom">
+
+        <!-- Copyright -->
+        <div class="footer-copyright text-center py-3">© 2020 Copyright:
+            <a href="https://cofc.edu/"> College of Charleston</a>
+        </div>
+        <!-- Copyright -->
+
+    </footer>
+    <!-- Footer -->
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+    <script>
+        var page = "{{ page }}";
+
+        var status = "{{ status }}";
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.9/js/mdb.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/1328657c58.js" crossorigin="anonymous"></script>
+    {% compress js %}
+    <script defer type="text/javascript" src="{% static 'js/main.js' %}"></script>
+    {% endcompress %}
+</body>
+
+</html>

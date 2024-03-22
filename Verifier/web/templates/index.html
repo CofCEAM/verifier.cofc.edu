@@ -1,0 +1,40 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container text-left py-5">
+    <div class="py-3 heading">
+        <h1>Verify a user's phone number</h1>
+        <p>Provide a user CWID to start phone number verification process.</p>
+        <form action="{% url 'web:get-phone-from-cwid' %}" method="post">
+            {% csrf_token %}
+            <label for="cwid" class="form-label">CWID</label>
+            <input oninput="validateCWID(this)" type="number" maxlength="8" minlength="8" name="cwid" id="cwid"
+                class="form-control" aria-describedby="cwid-help">
+            <div class="alert alert-danger d-none m-2 text-center" id="validation-error" role="alert">
+                Please provide an 8-digit CWID
+            </div>
+            <div id="cwid-help" class="form-text">
+                Provide the CWID of the user whose phone number you want to verify.
+            </div>
+            <div class="m-2 text-center"><input type="submit" class="btn btn-lg btn-primary" value="Get phone number">
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const validateCWID = (input) => {
+        let val = input.value;
+        let submitbtn = document.querySelector('input[type="submit"]')
+        let errormsg = document.querySelector('#validation-error');
+        if (val.length != 8) {
+            errormsg.classList.remove('d-none');
+            submitbtn.disabled = 'disabled';
+        } else {
+            errormsg.classList.add('d-none');
+            submitbtn.removeAttribute('disabled');
+        }
+    }
+</script>
+
+{% endblock %}

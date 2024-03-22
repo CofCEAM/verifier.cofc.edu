@@ -1,0 +1,14 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container text-left py-5">
+    <div class="py-3 heading">
+        <h1>No mobile phone found</h1>
+        <div class="alert alert-danger d-none m-2 text-center" id="validation-error" role="alert">
+            No mobile phone number was found on file for user with CWID {{cwid}}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

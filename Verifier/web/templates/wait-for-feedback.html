@@ -1,0 +1,46 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container text-left py-5">
+    <div class="py-3 heading">
+        <h1>Verify with user</h1>
+        <p>The passphrase {{passphrase}} was sent successfully to the phone number {{phone}} on file for CWID {{cwid}}.
+            Wait for the user to verify the following passphrase: {{passphrase}}. Once they provide feedback, indicate
+            below whether they verified successfully (did they provide the correct passphrase?).</p>
+        <form action="{% url 'web:verify' verify_attempt_id %}" method="post">
+            {% csrf_token %}
+            <div class="form-check">
+                <input value="yes" class="form-check-input" type="radio" name="verified" id="verifiedYes">
+                <label class="form-check-label" for="verifiedYes">
+                    Verified
+                </label>
+            </div>
+            <div class="form-check">
+                <input value="no" class="form-check-input" type="radio" name="verified" id="verifiedNo" checked>
+                <label class="form-check-label" for="verifiedNo">
+                    Not Verified
+                </label>
+            </div>
+            <div class="text-center m-2">
+                <input type="submit" class="btn btn-lg btn-primary" value="Save">
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const validateCWID = (input) => {
+        let val = input.value;
+        let submitbtn = document.querySelector('input[type="submit"]')
+        let errormsg = document.querySelector('#validation-error');
+        if (val.length != 8) {
+            errormsg.classList.remove('d-none');
+            submitbtn.disabled = 'disabled';
+        } else {
+            errormsg.classList.add('d-none');
+            submitbtn.removeAttribute('disabled');
+        }
+    }
+</script>
+
+{% endblock %}

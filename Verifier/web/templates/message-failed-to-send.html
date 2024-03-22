@@ -1,0 +1,15 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container text-left py-5">
+    <div class="py-3 heading">
+        <h1>SMS Failure</h1>
+        <div class="alert alert-danger d-none m-2 text-center" id="validation-error" role="alert">
+            The message failed to send to the phone number {{phone}}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
