@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from web.models import VerificationAttempt
 from django.conf import settings
-from web.util import VerifyUtil
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from web.models import VerificationAttempt
+from web.util import VerifyUtil
+
 import logging
 import json
 

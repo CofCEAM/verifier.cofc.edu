@@ -7,10 +7,13 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
 Django==5.0.3
 django-phonenumber-field==7.3.0
+django-phonenumbers==1.0.1
 frozenlist==1.4.1
 idna==3.6
 multidict==6.0.5
+mysqlclient==2.2.4
 oauthlib==3.2.2
+phonenumbers==8.13.32
 PyJWT==2.8.0
 python-dotenv==1.0.1
 PyYAML==6.0.1
