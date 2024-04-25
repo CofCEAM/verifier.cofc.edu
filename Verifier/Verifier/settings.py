@@ -144,6 +144,15 @@ PHONENUMBER_DEFAULT_REGION = "US"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
+# Sqlite3 by default
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+SITE_ID = 1
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -161,45 +170,42 @@ TWILIO_MESSAGING_SERVICE_SID = os.environ.get("TWILIO_MESSAGING_SERVICE_SID", ""
 ETHOS_API_KEY = os.environ.get("ETHOS_API_KEY", "")
 
 
+# This is necessary because Azure does not guarantee
+# to return scopes in the same case and order as requested
+os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
+os.environ["OAUTHLIB_IGNORE_SCOPE_CHANGE"] = "1"
+MICROSOFT_AUTH_CLIENT_ID = os.environ.get("MICROSOFT_AUTH_CLIENT_ID", "")
+MICROSOFT_AUTH_CLIENT_SECRET = os.environ.get("MICROSOFT_AUTH_CLIENT_SECRET", "")
+MICROSOFT_AUTH_TENANT_ID = os.environ.get("MICROSOFT_AUTH_TENANT_ID", "")
+MICROSOFT_AUTH_SCOPES = os.environ.get(
+    "MICROSOFT_AUTH_SCOPES", "openid profile offline_access user.read"
+)
+MICROSOFT_AUTH_AUTHORITY = os.environ.get(
+    "MICROSOFT_AUTH_AUTHORITY",
+    f"https://login.microsoftonline.com/{MICROSOFT_AUTH_TENANT_ID}",
+)
+MICROSOFT_AUTH_AUTHORIZE_ENDPOINT = f"{MICROSOFT_AUTH_AUTHORITY}/oauth2/v2.0/authorize"
+MICROSOFT_AUTH_TOKEN_ENDPOINT = f"{MICROSOFT_AUTH_AUTHORITY}/oauth2/v2.0/token"
+MICROSOFT_AUTH_REDIRECT_URI = os.environ.get(
+    "MICROSOFT_AUTH_REDIRECT_URI", "/custom-microsoft-callback"
+)
+MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID = os.environ.get(
+    "MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID", ""
+)
+if not all(
+    [
+        MICROSOFT_AUTH_CLIENT_ID,
+        MICROSOFT_AUTH_CLIENT_SECRET,
+        MICROSOFT_AUTH_TENANT_ID,
+        MICROSOFT_AUTH_SCOPES,
+        MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID,
+    ]
+):
+    raise ValueError(
+        "Missing one or more required environment variables for Microsoft Authentication"
+    )
 # PROD specific settings
 if PRODUCTION:
-    # This is necessary because Azure does not guarantee
-    # to return scopes in the same case and order as requested
-    os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
-    os.environ["OAUTHLIB_IGNORE_SCOPE_CHANGE"] = "1"
-    MICROSOFT_AUTH_CLIENT_ID = os.environ.get("MICROSOFT_AUTH_CLIENT_ID", "")
-    MICROSOFT_AUTH_CLIENT_SECRET = os.environ.get("MICROSOFT_AUTH_CLIENT_SECRET", "")
-    MICROSOFT_AUTH_TENANT_ID = os.environ.get("MICROSOFT_AUTH_TENANT_ID", "")
-    MICROSOFT_AUTH_SCOPES = os.environ.get(
-        "MICROSOFT_AUTH_SCOPES", "openid profile offline_access user.read"
-    )
-    MICROSOFT_AUTH_AUTHORITY = os.environ.get(
-        "MICROSOFT_AUTH_AUTHORITY",
-        f"https://login.microsoftonline.com/{MICROSOFT_AUTH_TENANT_ID}",
-    )
-    MICROSOFT_AUTH_AUTHORIZE_ENDPOINT = (
-        f"{MICROSOFT_AUTH_AUTHORITY}/oauth2/v2.0/authorize"
-    )
-    MICROSOFT_AUTH_TOKEN_ENDPOINT = f"{MICROSOFT_AUTH_AUTHORITY}/oauth2/v2.0/token"
-    MICROSOFT_AUTH_REDIRECT_URI = os.environ.get(
-        "MICROSOFT_AUTH_REDIRECT_URI", "/custom-microsoft-callback"
-    )
-    MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID = os.environ.get(
-        "MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID", ""
-    )
-    if not all(
-        [
-            MICROSOFT_AUTH_CLIENT_ID,
-            MICROSOFT_AUTH_CLIENT_SECRET,
-            MICROSOFT_AUTH_TENANT_ID,
-            MICROSOFT_AUTH_SCOPES,
-            MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID,
-        ]
-    ):
-        raise ValueError(
-            "Missing one or more required environment variables for Microsoft Authentication"
-        )
-
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
@@ -210,4 +216,3 @@ if PRODUCTION:
             "PORT": "3306",
         }
     }
-    SITE_ID = 1
