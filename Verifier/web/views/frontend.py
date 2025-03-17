@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
+from django.urls import reverse
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from web.models import VerificationAttempt
@@ -75,58 +76,93 @@ class GetPhoneFromCWIDView(View, LoginRequiredMixin):
 
 
 class SendPassphraseView(View, LoginRequiredMixin):
-    def get(self, request):
+    def post(self, request):
         logger.info(
             {
                 "action": "SendPassphraseView.get",
                 "user": request.user.username,
-                "query_params": request.GET,
+                "payload": request.POST,
             }
         )
-        cwid = request.GET.get("cwid")
-        passphrase = request.GET.get("passphrase")
-        phone = request.GET.get("phone")
-        verify_attempt_id = request.GET.get("verify_attempt_id")
-        logger.info(
-            {
-                "cwid": cwid,
-                "passphrase": passphrase,
-                "phone": phone,
-                "verify_attempt_id": verify_attempt_id,
-            }
-        )
-        if passphrase and phone:
+        cwid, passphrase, phone, verify_attempt_id = [
+            request.POST.get(k)
+            for k in ["cwid", "passphrase", "phone", "verify_attempt_id"]
+        ]
+        args = {
+            "cwid": cwid,
+            "passphrase": passphrase,
+            "phone": phone,
+            "verify_attempt_id": verify_attempt_id,
+        }
+        logger.info(args)
+        query_params = QueryDict("", mutable=True)
+        query_params.update(args)  # args is your dictionary of values.
+        if all([x is not None for x in [cwid, passphrase, phone, verify_attempt_id]]):
             verify_util = VerifyUtil()
             sent_message = verify_util.send_passphrase_to_cell(
                 passphrase=passphrase, phone_number=phone
             )
             if sent_message:
-                return render(
-                    request,
-                    template_name="wait-for-feedback.html",
-                    context={
-                        "phone": phone,
-                        "passphrase": passphrase,
-                        "cwid": cwid,
-                        "verify_attempt_id": verify_attempt_id,
-                    },
+                attempt = VerificationAttempt.objects.get(id=verify_attempt_id)
+                attempt.message_delivery_status = "Success"
+                attempt.save()
+                return redirect(
+                    reverse("web:wait-for-feedback") + "?" + query_params.urlencode()
                 )
             else:
-                return render(
-                    request,
-                    template_name="message-failed-to-send.html",
-                    context={"phone": phone},
+                return redirect(
+                    to=reverse(
+                        "web:message-failed-to-send" + "?" + query_params.urlencode()
+                    )
                 )
         else:
             logger.error(
-                {"error": "please provide keys phone and passphrase in GET payload"}
+                {
+                    "error": "please provide full payload cwid, passphrase, phone, verify_attempt_id"
+                }
             )
             return HttpResponse(
                 json.dumps(
-                    {"error": "please provide keys phone and message in POST payload"}
+                    {
+                        "error": "please provide full payload cwid, passphrase, phone, verify_attempt_id"
+                    }
                 ),
                 content_type="application/json",
             )
+
+
+class WaitForFeedback(View, LoginRequiredMixin):
+    def get(self, request):
+        cwid, passphrase, phone, verify_attempt_id = [
+            request.GET.get(k)
+            for k in ["cwid", "passphrase", "phone", "verify_attempt_id"]
+        ]
+
+        return render(
+            request,
+            template_name="wait-for-feedback.html",
+            context={
+                "phone": phone,
+                "passphrase": passphrase,
+                "cwid": cwid,
+                "verify_attempt_id": verify_attempt_id,
+            },
+        )
+
+
+class MessageFailedToSend(View, LoginRequiredMixin):
+    def get(self, request):
+        phone = request.GET.get("phone")
+        attempt = VerificationAttempt.objects.get(
+            id=request.GET.get("verify_attempt_id")
+        )
+        attempt.message_delivery_status = "Failed"
+        attempt.save()
+        return render(
+            request,
+            template_name="message-failed-to-send.html",
+            context={"phone": phone},
+        )
 
 
 class Verify(View, LoginRequiredMixin):
