@@ -20,11 +20,11 @@
     <div class="card">
         <h5 class="card-header">Verification Log</h5>
         <div class="card-body">
-            <table id="verification-attempts" class="datatable" data-search-align="left" data-toggle="table"
-                data-search="true" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+            <table id="verification-attempts" class="datatable" data-search-align="left" data-toggle="table" data-search="true" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
                 <thead>
                     <tr>
                         <th class="th-sm">ID</th>
+                        <th class="th-sm">Timestamp</th>
                         <th class="th-sm">Verifier</th>
                         <th class="d-none d-sm-table-cell">CWID</th>
                         <th class="d-none d-sm-table-cell">Phone to Verify</th>
@@ -37,6 +37,7 @@
                     {% for attempt in verification_attempts %}
                     <tr {% if attempt.verification_successful %} class="success" {% else %} class="failed" {% endif %}>
                         <td>{{ attempt.id}}</td>
+                        <td>{{attempt.timestamp}}</td>
                         <td>{{attempt.verifier.username}}</td>
                         <td class="d-none d-sm-table-cell">{{attempt.cwid}}</td>
                         <td class="d-none d-sm-table-cell">{{attempt.phone_number}}</td>
@@ -49,6 +50,7 @@
                 <tfoot>
                     <tr>
                         <th class="th-sm">ID</th>
+                        <th class="th-sm">Timestamp</th>
                         <th class="th-sm">Verifier</th>
                         <th class="d-none d-sm-table-cell">CWID</th>
                         <th class="d-none d-sm-table-cell">Phone to Verify</th>

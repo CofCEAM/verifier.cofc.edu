@@ -10,13 +10,22 @@
         </p>
         <h2>Message:</h2>
         <pre>{{message}}</pre>
+        <br />
+        <form id="csrf-form" action="{% url 'web:send-passphrase' %}" method="post">
+            {% csrf_token %}
+            <input name="passphrase" value="{{passphrase}}" class="d-none">
+            <input name="phone" value="{{phone}}" class="d-none">
+            <input name="cwid" value="{{cwid}}" class="d-none">
+            <input name="verify_attempt_id" value="{{verify_attempt_id}}" class="d-none">
 
-        <div class="text-center m-2">
-            <a href="{% url 'web:send-passphrase' %}?phone={{phone}}&passphrase={{passphrase}}&cwid={{cwid}}&verify_attempt_id={{verify_attempt_id}}"
-                class="btn btn-lg btn-success">Send Passphrase</a>
-        </div>
+            <div class="text-center m-2">
+                <button class="btn btn-lg btn-success" type="submit">Send Passphrase</button>
+            </div>
+        </form>
+
     </div>
 </div>
+
 
 
 {% endblock %}
