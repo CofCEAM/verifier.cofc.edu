@@ -21,6 +21,7 @@ PRODUCTION = int(os.environ.get("PRODUCTION", False))
 CSRF_TRUSTED_ORIGINS = [
     "https://login.microsoftonline.com",
     "https://verifier.cofc.edu",
+    "https://verifier.charleston.edu",
 ]
 
 ALLOWED_HOSTS = [
