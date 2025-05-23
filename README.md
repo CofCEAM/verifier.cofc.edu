@@ -121,3 +121,9 @@ systemctl restart apache2
 tail -f /var/log/apache2/verifier-[access/error].log # now open verifier.charleston.edu in a browser and monitor the log 
 ```
 
+
+## How to Connect to the Production Database 
+
+1. Log into the production web server (django linode). 
+3. Use the MySQL creds in the environment file: `cat /var/www/verifier.charleston.edu/Verifier/Verifier/.env`.
+
