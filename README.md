@@ -55,6 +55,15 @@ MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID=CHANGEME
 ```
 
 
+## Microsoft Azure Application Setup 
+
+The service principal (enterprise application) ID and the app registration (client) ID will not need to change unless you create completely different Azure applications. The only thing you need to change (renew) is the app registration's client secret under the Manage > Certificates & Secrets tab.
+
+### Single Sign On 
+Please note this is not using the "Single sign-on" tab under the Enterprise app. Instead, this is a modern form of authentication that integrates Azure AD as an identity provider using an Open ID Connect flow. This means all you really need is the app registration with a Graph API User.Read API permission to start the sign in (client ID and client secret). Once signed in, the app makes one additional Graph API call (on behalf of the signed in user, which means it does not need an admin permission) to `url = f"{graph_url}/beta/servicePrincipals/{settings.MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID}/appRoleAssignedTo"` to check if the user has access to the service principal (enterprise app), defined by the enterprise app's users and groups tab. 
+
+
+
 ## Contributing
 
 1. Clone the repository: `git clone https://github.com/CofCEAM/verifier.cofc.edu`
