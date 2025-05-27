@@ -62,7 +62,10 @@ The service principal (enterprise application) ID and the app registration (clie
 ### Single Sign On 
 Please note this is not using the "Single sign-on" tab under the Enterprise app. Instead, this is a modern form of authentication that integrates Azure AD as an identity provider using an Open ID Connect flow. This means all you really need is the app registration with a Graph API User.Read API permission to start the sign in (client ID and client secret). Once signed in, the app makes one additional Graph API call (on behalf of the signed in user, which means it does not need an admin permission) to `url = f"{graph_url}/beta/servicePrincipals/{settings.MICROSOFT_AUTH_SERVICE_PRINCIPAL_ID}/appRoleAssignedTo"` to check if the user has access to the service principal (enterprise app), defined by the enterprise app's users and groups tab. 
 
+## Twilio Config
+An admin of the IT twilio account will need to assist with Twilio configuration troubleshooting if anything goes awry with SMS. Usually it's an account balance issue and it just needs to be refilled. 
 
+The service used by this app is User Phone Verification under the Information Technology account. (Develop > Messaging > Services > User Phone Verification). 
 
 ## Contributing
 
